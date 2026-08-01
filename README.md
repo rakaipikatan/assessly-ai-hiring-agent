@@ -8,18 +8,18 @@
 
 ## Features
 
-- **AI Competency Mapping** — Automatically analyzes job requirements and maps required competencies
+- **AI Competency Mapping** — Analyzes job requirements and maps competencies automatically
 - **Assessment Generation** — AI generates tailored assessments (MCQ, Short Answer, Essay)
 - **Candidate Portal** — Candidates take assessments directly in the application
-- **AI Evaluation** — Automated scoring with detailed feedback per answer
+- **AI Evaluation** — Automated scoring with detailed feedback
 - **Hiring Recommendations** — Data-driven recommendations with explainable reasoning
 
 ## Architecture
 
 ```
-Recruiter → Describe Job → AI Agent → Assessment Blueprint → Generate Questions
-                                                                    ↓
-Hiring Recommendation ← AI Evaluation ← Candidate Answers ← Candidate Portal
+Recruiter → Describe Job → AI Agent → Competency Map → Generate Questions
+                                                              ↓
+Hiring Report ← AI Evaluation ← Submit Answers ← Candidate Portal
 ```
 
 ## Tech Stack
@@ -27,30 +27,24 @@ Hiring Recommendation ← AI Evaluation ← Candidate Answers ← Candidate Port
 | Component | Technology |
 |-----------|-----------|
 | Frontend | Streamlit in Snowflake |
-| AI Model | Snowflake Cortex (mistral-large2) |
+| AI Model | Snowflake Cortex AI (mistral-large2) |
 | Database | Snowflake |
-| Backend | Snowflake Stored Procedures (JavaScript) |
+| Backend | Stored Procedures (JavaScript) |
 
 ## Setup
 
 ### 1. Run Database Setup
 
-Execute `scripts/setup_database.sql` in a Snowflake worksheet to create:
-- Database & Schema (`ASSESSLY_DB.ASSESSLY_SCHEMA`)
-- 7 tables (jobs, competencies, assessments, questions, candidates, candidate_answers, evaluations)
-- 5 stored procedures (AI-powered)
-- 1 helper function
+Execute `scripts/setup_database.sql` in a Snowflake worksheet.
 
-### 2. Deploy Streamlit App
+### 2. Deploy Streamlit
 
 ```sql
--- Create stage and upload files
 CREATE STAGE IF NOT EXISTS ASSESSLY_DB.ASSESSLY_SCHEMA.STREAMLIT_STAGE;
 
 PUT file://streamlit/assessly_app.py @ASSESSLY_DB.ASSESSLY_SCHEMA.STREAMLIT_STAGE/ OVERWRITE=TRUE AUTO_COMPRESS=FALSE;
 PUT file://streamlit/environment.yml @ASSESSLY_DB.ASSESSLY_SCHEMA.STREAMLIT_STAGE/ OVERWRITE=TRUE AUTO_COMPRESS=FALSE;
 
--- Create Streamlit
 CREATE OR REPLACE STREAMLIT ASSESSLY_DB.ASSESSLY_SCHEMA.ASSESSLY_APP
     ROOT_LOCATION = '@ASSESSLY_DB.ASSESSLY_SCHEMA.STREAMLIT_STAGE'
     MAIN_FILE = '/assessly_app.py'
@@ -58,18 +52,9 @@ CREATE OR REPLACE STREAMLIT ASSESSLY_DB.ASSESSLY_SCHEMA.ASSESSLY_APP
     TITLE = 'Assessly - AI Hiring Agent';
 ```
 
-### 3. Access the App
+### 3. Access
 
-Open Snowsight → **Projects > Streamlit > ASSESSLY_APP**
-
-## Workflow
-
-1. **Recruiter** creates a job with requirements
-2. **AI** analyzes and generates competency mapping
-3. **AI** creates a tailored assessment (10 questions)
-4. **Candidates** receive access tokens and take the assessment
-5. **AI** evaluates responses and provides scores + feedback
-6. **AI** generates hiring recommendations with confidence levels
+Snowsight > Projects > Streamlit > ASSESSLY_APP
 
 ## Project Structure
 
@@ -77,12 +62,10 @@ Open Snowsight → **Projects > Streamlit > ASSESSLY_APP**
 assessly-ai-hiring-agent/
 ├── README.md
 ├── scripts/
-│   └── setup_database.sql      # Database DDL + Stored Procedures
-├── streamlit/
-│   ├── assessly_app.py         # Main Streamlit application
-│   └── environment.yml         # Python dependencies
-└── docs/
-    └── product_vision.md       # Product vision document
+│   └── setup_database.sql
+└── streamlit/
+    ├── assessly_app.py
+    └── environment.yml
 ```
 
 ## License
