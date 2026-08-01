@@ -1,0 +1,6 @@
+# Assessly AI Hiring Agent - Dependencies
+*.pyc
+__pycache__/
+.env
+.DS_Store
+Thumbs.db
